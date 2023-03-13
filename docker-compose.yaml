@@ -24,6 +24,21 @@ services:
      - ME_CONFIG_MONGODB_SERVER=mongodb
     depends_on:
      - "mongodb"
+  webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      - nodejs
+    networks:
+      - app-network
 volumes:
   mongo-data:
+  web-root:
+  nginx-conf:
     driver: local
