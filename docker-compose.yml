@@ -1,9 +1,27 @@
 version: '3'
 services:
-  # my-app:
-    # image: ${docker-registry}/my-app:1.0
-    # ports:
-     # - 3000:3000
+  nodejs:
+    image: nodejs:dev
+    container_name: nodejs
+    hostname: nodejs
+    ports:
+     - "8888:8888"
+    networks:
+     - example-net  
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    hostname: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      - nodejs
+    networks:
+     - example-net
   mongodb:
     image: mongo
     ports:
@@ -24,19 +42,9 @@ services:
      - ME_CONFIG_MONGODB_SERVER=mongodb
     depends_on:
      - "mongodb"
-  webserver:
-    image: nginx:mainline-alpine
-    container_name: webserver
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    volumes:
-      - web-root:/var/www/html
-      - ./nginx-conf:/etc/nginx/conf.d
-    depends_on:
-      - nodejs
-    networks:
-      - app-network
+networks:
+  example-net:
+    external: true
 volumes:
   mongo-data:
   web-root:
